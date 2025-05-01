@@ -1,0 +1,72 @@
+package com.aernaur.votingSystem.controller;
+
+import com.aernaur.votingSystem.dto.SearchCandidateDTO;
+import com.aernaur.votingSystem.dto.CandidateDTO;
+import com.aernaur.votingSystem.dto.ElectionDTO;
+import com.aernaur.votingSystem.dto.SubElectionDTO;
+import com.aernaur.votingSystem.exceptions.EntityNotFoundException;
+import com.aernaur.votingSystem.service.CandidateService;
+import com.aernaur.votingSystem.service.ElectionService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+@RestController()
+@RequestMapping("/election")
+public class ElectionController {
+
+    private final ElectionService electionService;
+    private final CandidateService candidateService;
+
+    public ElectionController(ElectionService electionService, CandidateService candidateService) {
+        this.electionService = electionService;
+        this.candidateService = candidateService;
+    }
+
+    @GetMapping
+    public List<ElectionDTO> listElections() {
+        return electionService.listElections();
+    }
+
+    @GetMapping("/{electionId}")
+    public ResponseEntity<ElectionDTO> getElection(@PathVariable("electionId") UUID electionId) throws EntityNotFoundException {
+        return ResponseEntity.ok(electionService.getElection(electionId));
+    }
+
+    @PostMapping
+    public ResponseEntity<Map<String, Object>> saveElection(@RequestBody @Valid ElectionDTO electionDTO) {
+        return ResponseEntity.ok(Map.of("id", electionService.saveElection(electionDTO)));
+    }
+
+    @GetMapping("/{electionId}/sub-election")
+    public List<SubElectionDTO> listSubElections(@PathVariable("electionId") UUID electionId) {
+        return electionService.listSubElections(electionId);
+    }
+
+    @PostMapping("/{electionId}/sub-election")
+    public ResponseEntity<Map<String, Object>> saveSubElection(@PathVariable("electionId") UUID electionId,
+                                                               @RequestBody SubElectionDTO subElectionDTO) {
+        return ResponseEntity.ok(Map.of("id", electionService.saveSubElection(electionId, subElectionDTO)));
+    }
+
+    @GetMapping("/{electionId}/candidate")
+    public List<CandidateDTO> searchCandidates(@PathVariable("electionId") UUID electionId,
+                                               @ModelAttribute SearchCandidateDTO filters) {
+        return candidateService.searchCandidates(electionId, filters);
+    }
+
+    @PostMapping("/candidate")
+    public ResponseEntity<Map<String, Object>> saveCandidate(@RequestBody @Valid CandidateDTO candidateDTO) {
+        return ResponseEntity.ok(Map.of("id", candidateService.saveCandidate(candidateDTO)));
+    }
+}

@@ -85,7 +85,10 @@ public class PersonService {
     private String uploadProfilePic(UUID personId, MultipartFile multipartFile) throws ProfilePicUploadException {
         try {
             File file = convertMultipartToFile(personId, multipartFile);
-            s3Client.putObject(PutObjectRequest.builder().bucket(awsBucketName).key(file.getName()).build(),
+            s3Client.putObject(PutObjectRequest.builder()
+                                               .bucket(awsBucketName)
+                                               .key(file.getName())
+                                               .build(),
                                RequestBody.fromFile(file));
             Files.delete(file.toPath());
             return file.getName();

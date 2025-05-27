@@ -21,7 +21,7 @@ public class CandidateService {
         this.candidateRepository = candidateRepository;
     }
 
-    public List<CandidateDTO> searchCandidates(UUID electionId, SearchCandidateDTO filters) {
+    public List<CandidateDTO> searchCandidates(SearchCandidateDTO filters) {
         return candidateRepository.searchCandidates(filters.subElectionId());
     }
 

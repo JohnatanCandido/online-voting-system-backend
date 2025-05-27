@@ -5,13 +5,16 @@ CREATE TABLE election (
     name VARCHAR(50) NOT NULL,
     description VARCHAR(255) NOT NULL,
     start_date DATE NOT NULL,
-    end_date DATE NOT NULL
+    end_date DATE NOT NULL,
+    confirmed BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE sub_election (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     position_name VARCHAR(50) NOT NULL,
     election_id UUID NOT NULL,
+    chairs SMALLINT NOT NULL,
+    type VARCHAR(25) NOT NULL,
     FOREIGN KEY (election_id) REFERENCES election(id) ON DELETE CASCADE
 );
 
@@ -52,3 +55,28 @@ CREATE TABLE candidate (
     FOREIGN KEY (sub_election_id) REFERENCES sub_election(id)
 );
 
+CREATE TABLE voter (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    person_id UUID NOT NULL,
+    sub_election_id UUID NOT NULL,
+    vote_computed TIMESTAMP,
+    FOREIGN KEY (person_id) REFERENCES person(id),
+    FOREIGN KEY (sub_election_id) REFERENCES sub_election(id)
+);
+
+CREATE TABLE encrypted_vote (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    sub_election_id UUID NOT NULL,
+    encrypted_data TEXT NOT NULL,
+    FOREIGN KEY (sub_election_id) REFERENCES sub_election(id)
+);
+
+CREATE TABLE vote (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    encrypted_vote_id UUID NOT NULL UNIQUE,
+    sub_election_id UUID NOT NULL,
+    candidate_id UUID,
+    FOREIGN KEY (encrypted_vote_id) REFERENCES encrypted_vote(id),
+    FOREIGN KEY (sub_election_id) REFERENCES sub_election(id),
+    FOREIGN KEY (candidate_id) REFERENCES candidate(id)
+);

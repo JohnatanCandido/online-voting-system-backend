@@ -8,6 +8,7 @@ import com.aernaur.votingSystem.exceptions.EntityNotFoundException;
 import com.aernaur.votingSystem.service.CandidateService;
 import com.aernaur.votingSystem.service.ElectionService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -15,14 +16,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@RestController()
-@RequestMapping("/election")
+@RestController
+@RequestMapping("/elections")
 public class ElectionController {
 
     private final ElectionService electionService;
@@ -59,14 +61,19 @@ public class ElectionController {
         return ResponseEntity.ok(Map.of("id", electionService.saveSubElection(electionId, subElectionDTO)));
     }
 
-    @GetMapping("/{electionId}/candidate")
-    public List<CandidateDTO> searchCandidates(@PathVariable("electionId") UUID electionId,
-                                               @ModelAttribute SearchCandidateDTO filters) {
-        return candidateService.searchCandidates(electionId, filters);
+    @GetMapping("/candidates")
+    public List<CandidateDTO> searchCandidates(@ModelAttribute SearchCandidateDTO filters) {
+        return candidateService.searchCandidates(filters);
     }
 
     @PostMapping("/candidate")
     public ResponseEntity<Map<String, Object>> saveCandidate(@RequestBody @Valid CandidateDTO candidateDTO) {
         return ResponseEntity.ok(Map.of("id", candidateService.saveCandidate(candidateDTO)));
+    }
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @PostMapping("/{electionId}/count-votes")
+    public void countVotes(@PathVariable("electionId") UUID electionId) {
+        electionService.countVotes(electionId);
     }
 }

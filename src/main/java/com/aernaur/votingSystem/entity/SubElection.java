@@ -7,12 +7,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -34,6 +37,9 @@ public class SubElection implements Serializable {
     @ManyToOne
     @JoinColumn(name = "election_id")
     private Election election;
+
+    @OneToMany(mappedBy = "subElection")
+    private List<Candidate> candidates = new ArrayList<>();
 
     public SubElection(UUID id) {
         this.id = id;

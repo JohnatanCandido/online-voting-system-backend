@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,7 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ElectionDTO implements Serializable {
 
-    private UUID id;
+    private UUID electionId;
 
     @NotBlank
     private String name;
@@ -33,10 +34,10 @@ public class ElectionDTO implements Serializable {
     @NotNull
     private LocalDate end;
 
-    private List<SubElectionDTO> subElections;
+    private List<SubElectionDTO> subElections = new ArrayList<>();
 
     public ElectionDTO(Election election) {
-        this.id = election.getId();
+        this.electionId = election.getId();
         this.name = election.getName();
         this.description = election.getDescription();
         this.start = election.getStartDate();

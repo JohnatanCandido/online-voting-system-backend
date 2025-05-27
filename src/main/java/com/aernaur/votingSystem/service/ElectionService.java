@@ -7,6 +7,7 @@ import com.aernaur.votingSystem.dto.SubElectionDTO;
 import com.aernaur.votingSystem.exceptions.EntityNotFoundException;
 import com.aernaur.votingSystem.repository.ElectionRepository;
 import com.aernaur.votingSystem.repository.SubElectionRepository;
+import com.aernaur.votingSystem.service.queue.QueueManager;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,20 +16,24 @@ import java.util.UUID;
 @Service
 public class ElectionService {
 
+    private final QueueManager queueManager;
     private final ElectionRepository electionRepository;
     private final SubElectionRepository subElectionRepository;
 
-    public ElectionService(ElectionRepository electionRepository, SubElectionRepository subElectionRepository) {
+    public ElectionService(QueueManager queueManager,
+                           ElectionRepository electionRepository,
+                           SubElectionRepository subElectionRepository) {
+        this.queueManager = queueManager;
         this.electionRepository = electionRepository;
         this.subElectionRepository = subElectionRepository;
     }
 
     public UUID saveElection(ElectionDTO electionDTO) {
         Election election;
-        if (electionDTO.getId() == null) {
+        if (electionDTO.getElectionId() == null) {
             election = new Election();
         } else {
-            election = electionRepository.findById(electionDTO.getId()).orElseThrow();
+            election = electionRepository.findById(electionDTO.getElectionId()).orElseThrow();
         }
         election.setName(electionDTO.getName());
         election.setDescription(electionDTO.getDescription());
@@ -66,5 +71,12 @@ public class ElectionService {
 
     public List<SubElectionDTO> listSubElections(UUID electionId) {
         return subElectionRepository.listSubElections(electionId);
+    }
+
+    public void countVotes(UUID electionId) {
+        Election election = electionRepository.findById(electionId).orElseThrow();
+        for (SubElection subElection : election.getSubElections()) {
+            queueManager.sendCountVotes(subElection.getId());
+        }
     }
 }

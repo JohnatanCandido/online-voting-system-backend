@@ -24,4 +24,12 @@ public interface CandidateRepository extends JpaRepository<Candidate, UUID> {
             WHERE candidate.subElection.id = :subElectionId
             """)
     List<CandidateDTO> searchCandidates(@Param("electionId") UUID subElectionId);
+
+    @Query("""
+        SELECT candidate.id
+        FROM Candidate candidate
+        WHERE candidate.subElection.id = :subElectionId
+          AND candidate.number = :candidateNumber
+        """)
+    UUID findCandidateId(@Param("electionId") UUID subElectionId, @Param("candidateNumber") Integer candidateNumber);
 }

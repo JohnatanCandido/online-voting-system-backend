@@ -1,25 +1,17 @@
 package com.aernaur.votingSystem.service;
 
+import com.aernaur.votingSystem.dto.PersonDTO;
 import com.aernaur.votingSystem.dto.SearchPeopleDTO;
 import com.aernaur.votingSystem.entity.Login;
 import com.aernaur.votingSystem.entity.Person;
-import com.aernaur.votingSystem.dto.PersonDTO;
 import com.aernaur.votingSystem.exceptions.EntityNotFoundException;
 import com.aernaur.votingSystem.exceptions.ProfilePicUploadException;
 import com.aernaur.votingSystem.repository.PersonRepository;
-import org.springframework.beans.factory.annotation.Value;
+import com.aernaur.votingSystem.repository.specifictaions.PersonSpecification;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetUrlRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -27,22 +19,24 @@ import java.util.UUID;
 @Service
 public class PersonService {
 
-    @Value("${aws.bucket.name}")
-    private String awsBucketName;
-
+    private final PersonProfilePicService personProfilePicService;
     private final PersonRepository personRepository;
-    private final S3Client s3Client;
 
-    public PersonService(PersonRepository personRepository, S3Client s3Client) {
+    public PersonService(PersonProfilePicService personProfilePicService,
+                         PersonRepository personRepository) {
+        this.personProfilePicService = personProfilePicService;
         this.personRepository = personRepository;
-        this.s3Client = s3Client;
     }
 
-    public List<PersonDTO> searchPeople(SearchPeopleDTO filters) throws EntityNotFoundException {
+    public List<PersonDTO> searchPeople(SearchPeopleDTO filters) {
+        Specification<Person> spec = Specification.where(PersonSpecification.withId(filters.personId()))
+                                                  .and(PersonSpecification.nameLike(filters.name()));
+
+
         List<PersonDTO> people = new ArrayList<>();
-        for (Person person: personRepository.findAll()) {
+        for (Person person: personRepository.findAll(spec)) {
             var personDTO = new PersonDTO(person);
-            personDTO.setProfilePicUrl(getProfilePicUrl(person));
+            personDTO.setProfilePicUrl(personProfilePicService.getProfilePicUrl(person));
             people.add(personDTO);
         }
         return people;
@@ -75,49 +69,16 @@ public class PersonService {
     public String saveProfilePic(UUID personId, MultipartFile multipartFile) throws ProfilePicUploadException {
         Person person = personRepository.findById(personId).orElseThrow();
         if (person.getProfilePicS3Name() != null) {
-            deleteProfilePic(person);
+            personProfilePicService.deleteProfilePic(person);
         }
-        person.setProfilePicS3Name(uploadProfilePic(personId, multipartFile));
+        person.setProfilePicS3Name(personProfilePicService.uploadProfilePic(personId, multipartFile));
         person = personRepository.save(person);
-        return getProfilePicUrl(person);
-    }
-
-    private String uploadProfilePic(UUID personId, MultipartFile multipartFile) throws ProfilePicUploadException {
-        try {
-            File file = convertMultipartToFile(personId, multipartFile);
-            s3Client.putObject(PutObjectRequest.builder()
-                                               .bucket(awsBucketName)
-                                               .key(file.getName())
-                                               .build(),
-                               RequestBody.fromFile(file));
-            Files.delete(file.toPath());
-            return file.getName();
-        } catch (Exception e) {
-            throw new ProfilePicUploadException();
-        }
-    }
-
-    private File convertMultipartToFile(UUID personId, MultipartFile multipartFile) throws IOException {
-        File convFile = new File(personId.toString() + "-" + multipartFile.getOriginalFilename());
-        FileOutputStream fos = new FileOutputStream(convFile);
-        fos.write(multipartFile.getBytes());
-        fos.close();
-        return convFile;
-    }
-
-    private String getProfilePicUrl(Person person) {
-        return s3Client.utilities()
-                       .getUrl(GetUrlRequest.builder().bucket(awsBucketName).key(person.getProfilePicS3Name()).build())
-                       .toString();
+        return personProfilePicService.getProfilePicUrl(person);
     }
 
     public void deletePerson(UUID personId) throws EntityNotFoundException {
         Person person = personRepository.findById(personId).orElseThrow(() -> new EntityNotFoundException("person", personId));
-        deleteProfilePic(person);
+        personProfilePicService.deleteProfilePic(person);
         personRepository.delete(person);
-    }
-
-    private void deleteProfilePic(Person person) {
-        s3Client.deleteObject(DeleteObjectRequest.builder().bucket(awsBucketName).key(person.getProfilePicS3Name()).build());
     }
 }

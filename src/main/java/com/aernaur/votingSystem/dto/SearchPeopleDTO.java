@@ -7,5 +7,5 @@ import java.util.UUID;
 public record SearchPeopleDTO(UUID personId,
                               String name,
                               LocalDate birthDate,
-                              Long currentPartyId)
+                              UUID currentPartyId)
         implements Serializable {}

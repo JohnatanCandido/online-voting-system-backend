@@ -1,17 +1,13 @@
 package com.aernaur.votingSystem.controller;
 
-import com.aernaur.votingSystem.dto.SearchCandidateDTO;
-import com.aernaur.votingSystem.dto.CandidateDTO;
 import com.aernaur.votingSystem.dto.ElectionDTO;
 import com.aernaur.votingSystem.dto.SubElectionDTO;
 import com.aernaur.votingSystem.exceptions.EntityNotFoundException;
-import com.aernaur.votingSystem.service.CandidateService;
 import com.aernaur.votingSystem.service.ElectionService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,11 +24,9 @@ import java.util.UUID;
 public class ElectionController {
 
     private final ElectionService electionService;
-    private final CandidateService candidateService;
 
-    public ElectionController(ElectionService electionService, CandidateService candidateService) {
+    public ElectionController(ElectionService electionService) {
         this.electionService = electionService;
-        this.candidateService = candidateService;
     }
 
     @GetMapping
@@ -40,14 +34,14 @@ public class ElectionController {
         return electionService.listElections();
     }
 
-    @GetMapping("/{electionId}")
-    public ResponseEntity<ElectionDTO> getElection(@PathVariable("electionId") UUID electionId) throws EntityNotFoundException {
-        return ResponseEntity.ok(electionService.getElection(electionId));
-    }
-
     @PostMapping
     public ResponseEntity<Map<String, Object>> saveElection(@RequestBody @Valid ElectionDTO electionDTO) {
         return ResponseEntity.ok(Map.of("id", electionService.saveElection(electionDTO)));
+    }
+
+    @GetMapping("/{electionId}")
+    public ResponseEntity<ElectionDTO> getElection(@PathVariable("electionId") UUID electionId) throws EntityNotFoundException {
+        return ResponseEntity.ok(electionService.getElection(electionId));
     }
 
     @GetMapping("/{electionId}/sub-election")
@@ -59,16 +53,6 @@ public class ElectionController {
     public ResponseEntity<Map<String, Object>> saveSubElection(@PathVariable("electionId") UUID electionId,
                                                                @RequestBody SubElectionDTO subElectionDTO) {
         return ResponseEntity.ok(Map.of("id", electionService.saveSubElection(electionId, subElectionDTO)));
-    }
-
-    @GetMapping("/candidates")
-    public List<CandidateDTO> searchCandidates(@ModelAttribute SearchCandidateDTO filters) {
-        return candidateService.searchCandidates(filters);
-    }
-
-    @PostMapping("/candidate")
-    public ResponseEntity<Map<String, Object>> saveCandidate(@RequestBody @Valid CandidateDTO candidateDTO) {
-        return ResponseEntity.ok(Map.of("id", candidateService.saveCandidate(candidateDTO)));
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)

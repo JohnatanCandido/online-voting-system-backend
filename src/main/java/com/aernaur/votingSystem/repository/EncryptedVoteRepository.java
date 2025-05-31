@@ -13,7 +13,7 @@ public interface EncryptedVoteRepository extends JpaRepository<EncryptedVote, UU
     @Query("""
         SELECT encryptedVote
         FROM EncryptedVote encryptedVote
-        WHERE encryptedVote.subElection.id = :subElectionId
+        WHERE encryptedVote.subElectionId = :subElectionId
         """)
     List<EncryptedVote> findAllBySubElectionId(@Param("electionId") UUID subElectionId);
 }

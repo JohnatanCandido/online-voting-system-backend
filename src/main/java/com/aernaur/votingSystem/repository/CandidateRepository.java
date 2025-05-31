@@ -23,7 +23,7 @@ public interface CandidateRepository extends JpaRepository<Candidate, UUID> {
             JOIN candidate.party party
             WHERE candidate.subElection.id = :subElectionId
             """)
-    List<CandidateDTO> searchCandidates(@Param("electionId") UUID subElectionId);
+    List<CandidateDTO> searchCandidates(@Param("subElectionId") UUID subElectionId);
 
     @Query("""
         SELECT candidate.id
@@ -31,5 +31,21 @@ public interface CandidateRepository extends JpaRepository<Candidate, UUID> {
         WHERE candidate.subElection.id = :subElectionId
           AND candidate.number = :candidateNumber
         """)
-    UUID findCandidateId(@Param("electionId") UUID subElectionId, @Param("candidateNumber") Integer candidateNumber);
+    UUID findCandidateId(@Param("subElectionId") UUID subElectionId, @Param("candidateNumber") Integer candidateNumber);
+
+    @Query("""
+        SELECT new com.aernaur.votingSystem.dto.CandidateDTO(
+                        candidate.id,
+                        candidate.number,
+                        person.name,
+                        party.name,
+                        person.profilePicS3Name
+        )
+        FROM Candidate candidate
+        JOIN candidate.person person
+        JOIN candidate.party party
+        WHERE candidate.subElection.id = :subElectionId
+          AND candidate.number = :candidateNumber
+        """)
+    CandidateDTO findCandidate(@Param("subElectionId") UUID subElectionId, @Param("candidateNumber") Integer candidateNumber);
 }

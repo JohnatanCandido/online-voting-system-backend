@@ -31,6 +31,7 @@ public class CandidateDTO implements Serializable {
 
     private String candidateName;
     private String partyName;
+    private String profilePicS3Name;
 
     public CandidateDTO(UUID id,
                         Integer number,
@@ -40,5 +41,17 @@ public class CandidateDTO implements Serializable {
         this.number = number;
         this.candidateName = candidateName;
         this.partyName = partyName;
+    }
+
+    public CandidateDTO(UUID id,
+                        Integer number,
+                        String candidateName,
+                        String partyName,
+                        String profilePicS3Name) {
+        this.id = id;
+        this.number = number;
+        this.candidateName = candidateName;
+        this.partyName = partyName;
+        this.profilePicS3Name = profilePicS3Name;
     }
 }

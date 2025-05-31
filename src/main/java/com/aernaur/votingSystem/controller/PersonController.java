@@ -33,7 +33,7 @@ public class PersonController {
     }
 
     @GetMapping
-    public List<PersonDTO> searchPeople(@ModelAttribute SearchPeopleDTO filters) throws EntityNotFoundException {
+    public List<PersonDTO> searchPeople(@ModelAttribute SearchPeopleDTO filters) {
         return personService.searchPeople(filters);
     }
 

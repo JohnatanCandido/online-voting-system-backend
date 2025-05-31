@@ -39,4 +39,8 @@ public class CandidateService {
         candidate = candidateRepository.save(candidate);
         return candidate.getId();
     }
+
+    public CandidateDTO findCandidate(UUID subElectionId, Integer candidateNumber) {
+        return candidateRepository.findCandidate(subElectionId, candidateNumber);
+    }
 }

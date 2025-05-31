@@ -1,9 +1,9 @@
 services:
   rabbitmq:
-    container_name: 'ovs-rabbitmq'
     image: 'rabbitmq:latest'
+    container_name: ovs-rabbitmq
     environment:
-      - 'RABBITMQ_DEFAULT_PASS=secret'
-      - 'RABBITMQ_DEFAULT_USER=myuser'
+      - 'RABBITMQ_DEFAULT_PASS=${RABBIT_MQ_PASSWORD}'
+      - 'RABBITMQ_DEFAULT_USER=${RABBIT_MQ_USERNAME}'
     ports:
-      - '5672:5672'
+      - '5672'

@@ -3,6 +3,7 @@ package com.aernaur.votingSystem.controller;
 import com.aernaur.votingSystem.dto.PartyDTO;
 import com.aernaur.votingSystem.service.PartyService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,13 +19,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/parties")
+@RequiredArgsConstructor
 public class PartyController {
 
     private final PartyService partyService;
-
-    public PartyController(PartyService partyService) {
-        this.partyService = partyService;
-    }
 
     @GetMapping
     public List<PartyDTO> searchParties() {

@@ -6,27 +6,19 @@ import com.aernaur.votingSystem.exceptions.EncryptionException;
 import com.aernaur.votingSystem.repository.EncryptedVoteRepository;
 import com.aernaur.votingSystem.repository.VoteRepository;
 import com.aernaur.votingSystem.service.queue.QueueManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class ElectionVoteCountingService {
 
     private final QueueManager queueManager;
     private final EncryptionService encryptionService;
     private final EncryptedVoteRepository encryptedVoteRepository;
     private final VoteRepository voteRepository;
-
-    public ElectionVoteCountingService(QueueManager queueManager,
-                                       EncryptionService encryptionService,
-                                       EncryptedVoteRepository encryptedVoteRepository,
-                                       VoteRepository voteRepository) {
-        this.queueManager = queueManager;
-        this.encryptionService = encryptionService;
-        this.encryptedVoteRepository = encryptedVoteRepository;
-        this.voteRepository = voteRepository;
-    }
 
     public void countVotes(UUID subElectionId) {
         for (EncryptedVote encryptedVote: encryptedVoteRepository.findAllBySubElectionId(subElectionId)) {

@@ -36,9 +36,9 @@ CREATE TABLE person (
 
 CREATE TABLE login (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    username VARCHAR(25) NOT NULL,
-    password VARCHAR(25) NOT NULL,
-    admin BOOLEAN NOT NULL,
+    username VARCHAR(25) UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    role VARCHAR(25) NOT NULL,
     person_id UUID NOT NULL,
     FOREIGN KEY (person_id) REFERENCES person(id) ON DELETE CASCADE
 );

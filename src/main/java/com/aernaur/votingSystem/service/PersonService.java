@@ -4,11 +4,14 @@ import com.aernaur.votingSystem.dto.PersonDTO;
 import com.aernaur.votingSystem.dto.SearchPeopleDTO;
 import com.aernaur.votingSystem.entity.Login;
 import com.aernaur.votingSystem.entity.Person;
+import com.aernaur.votingSystem.entity.types.UserRole;
 import com.aernaur.votingSystem.exceptions.EntityNotFoundException;
 import com.aernaur.votingSystem.exceptions.ProfilePicUploadException;
 import com.aernaur.votingSystem.repository.PersonRepository;
 import com.aernaur.votingSystem.repository.specifictaions.PersonSpecification;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,16 +20,11 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class PersonService {
 
     private final PersonProfilePicService personProfilePicService;
     private final PersonRepository personRepository;
-
-    public PersonService(PersonProfilePicService personProfilePicService,
-                         PersonRepository personRepository) {
-        this.personProfilePicService = personProfilePicService;
-        this.personRepository = personRepository;
-    }
 
     public List<PersonDTO> searchPeople(SearchPeopleDTO filters) {
         Specification<Person> spec = Specification.where(PersonSpecification.withId(filters.personId()))
@@ -52,17 +50,25 @@ public class PersonService {
         }
         person.setName(personDTO.getPersonName());
         person.setBirthDate(personDTO.getBirthDate());
-        person.getLogin().setAdmin(personDTO.isAdmin());
+        setRole(person.getLogin(), personDTO);
         person = personRepository.save(person);
 
         return person.getId();
+    }
+
+    private void setRole(Login login, PersonDTO personDTO) {
+        if (personDTO.isAdmin()) {
+            login.setRole(UserRole.ADMIN);
+        } else {
+            login.setRole(UserRole.USER);
+        }
     }
 
     private Login createLogin(Person person, String name) {
         var login = new Login(person);
         String[] splitName = name.split(" ");
         login.setUsername((splitName[0] + "." + splitName[splitName.length-1]).toLowerCase());
-        login.setPassword("12345");
+        login.setPassword(new BCryptPasswordEncoder().encode("12345"));
         return login;
     }
 

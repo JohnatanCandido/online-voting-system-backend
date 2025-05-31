@@ -2,6 +2,7 @@ package com.aernaur.votingSystem.service;
 
 import com.aernaur.votingSystem.entity.Person;
 import com.aernaur.votingSystem.exceptions.ProfilePicUploadException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,16 +19,13 @@ import java.nio.file.Files;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class PersonProfilePicService {
 
     @Value("${aws.bucket.name}")
     private String awsBucketName;
 
     private final S3Client s3Client;
-
-    public PersonProfilePicService(S3Client s3Client) {
-        this.s3Client = s3Client;
-    }
 
     public String uploadProfilePic(UUID personId, MultipartFile multipartFile) throws ProfilePicUploadException {
         try {

@@ -5,6 +5,7 @@ import com.aernaur.votingSystem.dto.SubElectionDTO;
 import com.aernaur.votingSystem.exceptions.EntityNotFoundException;
 import com.aernaur.votingSystem.service.ElectionService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,13 +22,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/elections")
+@RequiredArgsConstructor
 public class ElectionController {
 
     private final ElectionService electionService;
-
-    public ElectionController(ElectionService electionService) {
-        this.electionService = electionService;
-    }
 
     @GetMapping
     public List<ElectionDTO> listElections() {

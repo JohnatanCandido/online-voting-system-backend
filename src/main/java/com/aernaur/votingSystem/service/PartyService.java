@@ -3,19 +3,17 @@ package com.aernaur.votingSystem.service;
 import com.aernaur.votingSystem.dto.PartyDTO;
 import com.aernaur.votingSystem.entity.Party;
 import com.aernaur.votingSystem.repository.PartyRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class PartyService {
 
     private final PartyRepository partyRepository;
-
-    public PartyService(PartyRepository partyRepository) {
-        this.partyRepository = partyRepository;
-    }
 
     public List<PartyDTO> searchParties() {
         return partyRepository.findAll().stream().map(PartyDTO::new).toList();

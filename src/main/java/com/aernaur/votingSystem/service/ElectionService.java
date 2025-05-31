@@ -8,25 +8,19 @@ import com.aernaur.votingSystem.exceptions.EntityNotFoundException;
 import com.aernaur.votingSystem.repository.ElectionRepository;
 import com.aernaur.votingSystem.repository.SubElectionRepository;
 import com.aernaur.votingSystem.service.queue.QueueManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class ElectionService {
 
     private final QueueManager queueManager;
     private final ElectionRepository electionRepository;
     private final SubElectionRepository subElectionRepository;
-
-    public ElectionService(QueueManager queueManager,
-                           ElectionRepository electionRepository,
-                           SubElectionRepository subElectionRepository) {
-        this.queueManager = queueManager;
-        this.electionRepository = electionRepository;
-        this.subElectionRepository = subElectionRepository;
-    }
 
     public UUID saveElection(ElectionDTO electionDTO) {
         Election election;

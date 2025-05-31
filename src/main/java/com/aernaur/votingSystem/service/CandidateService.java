@@ -7,19 +7,17 @@ import com.aernaur.votingSystem.entity.Person;
 import com.aernaur.votingSystem.entity.SubElection;
 import com.aernaur.votingSystem.dto.CandidateDTO;
 import com.aernaur.votingSystem.repository.CandidateRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class CandidateService {
 
     private final CandidateRepository candidateRepository;
-
-    public CandidateService(CandidateRepository candidateRepository) {
-        this.candidateRepository = candidateRepository;
-    }
 
     public List<CandidateDTO> searchCandidates(SearchCandidateDTO filters) {
         return candidateRepository.searchCandidates(filters.subElectionId());

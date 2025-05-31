@@ -6,6 +6,7 @@ import com.aernaur.votingSystem.exceptions.EntityNotFoundException;
 import com.aernaur.votingSystem.exceptions.ProfilePicUploadException;
 import com.aernaur.votingSystem.service.PersonService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,13 +25,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/people")
+@RequiredArgsConstructor
 public class PersonController {
 
     private final PersonService personService;
-
-    public PersonController(PersonService personService) {
-        this.personService = personService;
-    }
 
     @GetMapping
     public List<PersonDTO> searchPeople(@ModelAttribute SearchPeopleDTO filters) {

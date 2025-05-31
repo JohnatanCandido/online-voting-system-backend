@@ -4,6 +4,7 @@ import com.aernaur.votingSystem.dto.CandidateDTO;
 import com.aernaur.votingSystem.dto.SearchCandidateDTO;
 import com.aernaur.votingSystem.service.CandidateService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -19,13 +20,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/candidates")
+@RequiredArgsConstructor
 public class CandidateController {
 
     private final CandidateService candidateService;
-
-    public CandidateController(CandidateService candidateService) {
-        this.candidateService = candidateService;
-    }
 
     @GetMapping
     public List<CandidateDTO> searchCandidates(@ModelAttribute SearchCandidateDTO filters) {
